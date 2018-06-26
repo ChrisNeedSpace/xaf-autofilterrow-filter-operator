@@ -53,7 +53,7 @@ Installation
      at the command prompt (on Linux, Windows is a bit different)
    - To download directly, go to the `project page`_ and click **Download**
 
-#. Open a XAF Web project (or create one) and include the property editor file.
+#. Open XAF Win and Web project (or create one) and include the Significant Files.
 
 
 .. _XAF: http://go.devexpress.com/DevExpressDownload_UniversalTrial.aspx
