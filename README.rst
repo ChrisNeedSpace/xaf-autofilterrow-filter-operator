@@ -19,11 +19,11 @@ This is a feature for **DevExpress eXpressAppFramework (XAF)** that provides Aut
 
 **Significant Files**
 
-- TestProject17_2.Module\AutoFilterRow\AutoFilterRowConditionAttribute.cs
-- TestProject17_2.Module\AutoFilterRow\IModelMemberAutoFilterRow.cs
-- TestProject17_2.Module\Module.cs
-- TestProject17_2.Module.Win\Controllers\AutoFilterRow\WinAutoFilterRowConditionController.cs
-- TestProject17_2.Module.Web\Controllers\AutoFilterRow\WebAutoFilterRowConditionController.cs
+- TestProject17_2.Module\\AutoFilterRow\\AutoFilterRowConditionAttribute.cs
+- TestProject17_2.Module\\AutoFilterRow\\IModelMemberAutoFilterRow.cs
+- TestProject17_2.Module\\Module.cs
+- TestProject17_2.Module.Win\\Controllers\\AutoFilterRow\\WinAutoFilterRowConditionController.cs
+- TestProject17_2.Module.Web\\Controllers\\AutoFilterRow\\WebAutoFilterRowConditionController.cs
 
 **Example Of Use**
 
