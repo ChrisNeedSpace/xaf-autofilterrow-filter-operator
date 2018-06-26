@@ -104,6 +104,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoFilterRow\AutoFilterRowConditionAttribute.cs" />
+    <Compile Include="AutoFilterRow\IModelMemberAutoFilterRow.cs" />
     <Compile Include="BusinessObjects\SalesReturn.cs" />
     <Compile Include="BusinessObjects\SalesOrder.cs" />
     <Compile Include="BusinessObjects\Customer.cs" />

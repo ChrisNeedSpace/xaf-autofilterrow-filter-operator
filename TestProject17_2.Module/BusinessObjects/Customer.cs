@@ -5,6 +5,7 @@ using DevExpress.Xpo;
 
 namespace TestProject17_2.Module.BusinessObjects
 {
+  [DefaultClassOptions]
   [Persistent]
   public class Customer : BaseObject
   { 
@@ -14,6 +15,7 @@ namespace TestProject17_2.Module.BusinessObjects
     }
 
     private string _name;
+    [AutoFilterRowCondition(AutoFilterRowCondition.EndsWith)]
     public string Name
     {
       get { return _name; }

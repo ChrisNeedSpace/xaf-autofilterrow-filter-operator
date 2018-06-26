@@ -26,5 +26,12 @@ namespace TestProject17_2.Module.BusinessObjects
       get { return _customer; }
       set { SetPropertyValue(nameof(Customer), ref _customer, value); }
     }
+
+    private string _propertyWithTheOperatorChangedInModel;
+    public string PropertyWithTheOperatorChangedInModel
+    {
+      get { return _propertyWithTheOperatorChangedInModel; }
+      set { SetPropertyValue(nameof(PropertyWithTheOperatorChangedInModel), ref _propertyWithTheOperatorChangedInModel, value); }
+    }
   }
 }

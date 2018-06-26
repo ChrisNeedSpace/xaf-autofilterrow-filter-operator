@@ -27,5 +27,11 @@ namespace TestProject17_2.Module.BusinessObjects
       set { SetPropertyValue(nameof(Customer), ref _customer, value); }
     }
 
+    private string _propertyWithTheDefaultOperator;
+    public string PropertyWithTheDefaultOperator
+    {
+      get { return _propertyWithTheDefaultOperator; }
+      set { SetPropertyValue(nameof(PropertyWithTheDefaultOperator), ref _propertyWithTheDefaultOperator, value); }
+    }
   }
 }
