@@ -10,7 +10,7 @@ Compatible with XAF versions:
 -----------
 Description
 -----------
-This is a feature for **DevExpress eXpressAppFramework (XAF)** that provides AutoFilterRow with configurable operator - a mechanism that enables to specify in code or via model the default auto filter row operator for each field separately.
+This is a feature for **DevExpress eXpressAppFramework (XAF)** that **Line Of Business (LOB)** have decided to share with the community which provides AutoFilterRow with configurable operator - a mechanism that enables to specify in code or via model the default auto filter row operator for each field separately.
 
 **Functionality**
 
