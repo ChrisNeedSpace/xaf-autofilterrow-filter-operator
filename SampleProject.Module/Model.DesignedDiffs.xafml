@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application Title="SampleProject">
+  <BOModel>
+    <Class Name="SampleProject.Module.BusinessObjects.SalesReturn">
+      <OwnMembers>
+        <Member Name="PropertyWithTheOperatorChangedInModel" AutoFilterRowCondition="DoesNotContain" />
+      </OwnMembers>
+    </Class>
+  </BOModel>
+  <Options>
+    <LayoutManagerOptions RequiredFieldMark="*" />
+  </Options>
+  <SchemaModules>
+    <SchemaModule Name="SystemModule" Version="17.2.7.0" IsNewNode="True" />
+  </SchemaModules>
+  <Views>
+    <ListView Id="Customer_ListView" ShowAutoFilterRow="True" />
+    <ListView Id="SalesOrder_ListView" ShowAutoFilterRow="True" />
+    <ListView Id="SalesReturn_ListView" ShowAutoFilterRow="True" />
+  </Views>
+</Application>
