@@ -1,8 +1,6 @@
-﻿using DevExpress.ExpressApp;
-using DevExpress.ExpressApp.Model;
+﻿using System;
+using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.Win.Editors;
-using DevExpress.XtraGrid.Columns;
-using DevExpress.XtraGrid.Views.Grid;
 
 namespace AutoFilterRowEx.Win.Controllers
 {
@@ -22,89 +20,92 @@ namespace AutoFilterRowEx.Win.Controllers
 
     #endregion
 
-    #region OnViewControlsCreated
+    #region OnActivated
 
-    protected override void OnViewControlsCreated()
+    protected override void OnActivated()
     {
-      base.OnViewControlsCreated();
-
-      ListView listView = this.View as ListView;
-      GridListEditor gridListEditor = listView?.Editor as GridListEditor;
-      if (gridListEditor != null)
+      base.OnActivated();
+      if (this.View is ListView)
       {
-        GridView gridView = gridListEditor.GridView;
-        if (gridView != null && gridView.Columns.Count > 0)
-          foreach (GridColumn column in gridView.Columns)
-          {
-            IModelColumn modelColumn = gridListEditor.Model.Columns[column.Name];
-            IModelMemberAutoFilterRow modelMember = modelColumn?.ModelMember as IModelMemberAutoFilterRow;
-            if (modelMember != null && modelMember.AutoFilterRowCondition.HasValue)
-            {
-              //if (column.ColumnType == typeof(string))
-              column.OptionsFilter.AutoFilterCondition = TransformToAutoFilterCondition(modelMember.AutoFilterRowCondition.Value);
-            }
-          }
+        (this.View as ListView).Editor.ModelApplied += Editor_ModelApplied;
+        (this.View as ListView).Editor.ModelSaved += Editor_ModelSaved;
       }
     }
 
     #endregion
 
-    // Alternative implementation with saving the changes in model. BUT it saves also default operators, which wipes out XAF default operator... (not recommended, IMO)
+    #region OnDeactivated
 
-    //#region OnActivated & OnDeactivated
+    protected override void OnDeactivated()
+    {
+      if (this.View is ListView)
+      {
+        (this.View as ListView).Editor.ModelApplied -= Editor_ModelApplied;
+        (this.View as ListView).Editor.ModelSaved -= Editor_ModelSaved;
+      }
+      base.OnDeactivated();
+    }
 
-    //protected override void OnActivated()
+    #endregion
+
+    #region Editor_ModelSaved
+
+    private void Editor_ModelSaved(object sender, EventArgs e)
+    {
+      // Commented out. It saves default values as if they were user edits, which wipes out XAF default value if it will change in future... (not recommended, IMO)
+      //if (sender is GridListEditor)
+      //{
+      //  foreach (XafGridColumnWrapper columnWrapper in ((GridListEditor)sender).Columns)
+      //  {
+      //    IModelMemberAutoFilterRow modelMemberAutoFilterRow = columnWrapper.GridColumnInfo?.Model.ModelMember as IModelMemberAutoFilterRow;
+      //    if (modelMemberAutoFilterRow != null)
+      //      modelMemberAutoFilterRow.AutoFilterRowCondition = TransformFromAutoFilterCondition(columnWrapper.Column.OptionsFilter.AutoFilterCondition);
+      //  }
+      //}
+    }
+
+    #endregion
+
+    #region Editor_ModelApplied
+
+    private void Editor_ModelApplied(object sender, EventArgs e)
+    {
+      if (sender is GridListEditor)
+      {
+        foreach (XafGridColumnWrapper columnWrapper in ((GridListEditor)sender).Columns)
+        {
+          AutoFilterRowCondition? filterCondition = (columnWrapper.GridColumnInfo?.Model.ModelMember as IModelMemberAutoFilterRow)?.AutoFilterRowCondition;
+          if (filterCondition.HasValue)
+            columnWrapper.Column.OptionsFilter.AutoFilterCondition = TransformToAutoFilterCondition(filterCondition.Value);
+        }
+      }
+    }
+
+    #endregion
+
+    //#region OnViewControlsCreated
+
+    ////Alternative implementation
+    //protected override void OnViewControlsCreated()
     //{
-    //  base.OnActivated();
-    //  if (this.View is ListView)
+    //  base.OnViewControlsCreated();
+
+    //  ListView listView = this.View as ListView;
+    //  GridListEditor gridListEditor = listView?.Editor as GridListEditor;
+    //  if (gridListEditor != null)
     //  {
-    //    (this.View as ListView).Editor.ModelApplied += Editor_ModelApplied;
-    //    (this.View as ListView).Editor.ModelSaved += Editor_ModelSaved;
-    //  }
-    //}
-
-    //protected override void OnDeactivated()
-    //{
-    //  if (this.View is ListView)
-    //  {
-    //    (this.View as ListView).Editor.ModelApplied -= Editor_ModelApplied;
-    //    (this.View as ListView).Editor.ModelSaved -= Editor_ModelSaved;
-    //  }
-    //  base.OnDeactivated();
-    //}
-
-    //#endregion
-
-    //#region Editor_ModelSaved & Editor_ModelApplied
-
-    //private void Editor_ModelSaved(object sender, EventArgs e)
-    //{
-    //  if (sender is GridListEditor)
-    //  {
-    //    foreach (XafGridColumnWrapper columnWrapper in ((GridListEditor)sender).Columns)
+    //    foreach (XafGridColumnWrapper columnWrapper in gridListEditor.Columns)
     //    {
-    //      IModelMemberAutoFilterRow modelMemberAutoFilterRow = columnWrapper.GridColumnInfo?.Model.ModelMember as IModelMemberAutoFilterRow;
-    //      if (modelMemberAutoFilterRow != null)
-    //        modelMemberAutoFilterRow.AutoFilterRowCondition = TransformFromAutoFilterCondition(columnWrapper.Column.OptionsFilter.AutoFilterCondition);
+    //      IModelMemberAutoFilterRow modelMember = columnWrapper.GridColumnInfo?.Model.ModelMember as IModelMemberAutoFilterRow;
+    //      if (modelMember != null && modelMember.AutoFilterRowCondition.HasValue)
+    //      {
+    //        columnWrapper.Column.OptionsFilter.AutoFilterCondition = TransformToAutoFilterCondition(modelMember.AutoFilterRowCondition.Value);
+    //      }
     //    }
     //  }
     //}
 
-    //private void Editor_ModelApplied(object sender, EventArgs e)
-    //{
-    //  if (sender is GridListEditor)
-    //  {
-    //    foreach (XafGridColumnWrapper columnWrapper in ((GridListEditor)sender).Columns)
-    //    {
-    //      AutoFilterRowCondition? filterCondition = (columnWrapper.GridColumnInfo.Model.ModelMember as IModelMemberAutoFilterRow)?.AutoFilterRowCondition;
-    //      if (filterCondition.HasValue)
-    //        columnWrapper.Column.OptionsFilter.AutoFilterCondition = TransformToAutoFilterCondition(filterCondition.GetValueOrDefault());
-    //    }
-    //  }
-    //}
-
     //#endregion
-
 
     #region TransformToAutoFilterCondition
 

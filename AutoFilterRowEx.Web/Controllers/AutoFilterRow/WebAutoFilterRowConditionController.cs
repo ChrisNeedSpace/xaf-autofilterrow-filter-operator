@@ -1,7 +1,7 @@
-﻿using DevExpress.ExpressApp;
+﻿using System;
+using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.Model;
 using DevExpress.ExpressApp.Web.Editors.ASPx;
-using DevExpress.Web;
 
 namespace AutoFilterRowEx.Web.Controllers
 {
@@ -21,37 +21,100 @@ namespace AutoFilterRowEx.Web.Controllers
 
     #endregion
 
-    #region OnViewControlsCreated
+    #region OnActivated
 
-    protected override void OnViewControlsCreated()
+    protected override void OnActivated()
     {
-      base.OnViewControlsCreated();
-
-      ASPxGridListEditor listEditor = ((ListView)View).Editor as ASPxGridListEditor;
-      if (listEditor != null)
+      base.OnActivated();
+      if (this.View is ListView)
       {
-        ASPxGridView gridView = listEditor.Grid;
-        foreach (GridViewDataColumn dataColumn in gridView.DataColumns)
+        (this.View as ListView).Editor.ModelApplied += Editor_ModelApplied;
+        (this.View as ListView).Editor.ModelSaved += Editor_ModelSaved;
+      }
+    }
+
+    #endregion
+
+    #region OnDeactivated
+
+    protected override void OnDeactivated()
+    {
+      if (this.View is ListView)
+      {
+        (this.View as ListView).Editor.ModelApplied -= Editor_ModelApplied;
+        (this.View as ListView).Editor.ModelSaved -= Editor_ModelSaved;
+      }
+      base.OnDeactivated();
+    }
+
+    #endregion
+
+    #region Editor_ModelSaved
+
+    private void Editor_ModelSaved(object sender, EventArgs e)
+    {
+      // Commented out. It saves default values as if they were user edits, which wipes out XAF default value if it will change in future... (not recommended, IMO)
+      //if (sender is ASPxGridListEditor)
+      //{
+      //  foreach (DevExpress.ExpressApp.Editors.ColumnWrapper columnWrapper in ((ASPxGridListEditor)sender).Columns)
+      //  {
+      //    ASPxGridViewColumnWrapper gridColumnWrapper = columnWrapper as ASPxGridViewColumnWrapper;
+      //    if (gridColumnWrapper != null)
+      //    {
+      //      IModelColumn modelColumn = (this.View as ListView)?.Model.Columns[gridColumnWrapper.PropertyName];
+      //      IModelMemberAutoFilterRow modelMember = modelColumn?.ModelMember as IModelMemberAutoFilterRow;
+      //      if (modelMember != null)
+      //        modelMember.AutoFilterRowCondition = TransformFromAutoFilterCondition(gridColumnWrapper.Column.Settings.AutoFilterCondition);
+      //    }
+      //  }
+      //}
+    }
+
+    #endregion
+
+    #region Editor_ModelApplied
+
+    private void Editor_ModelApplied(object sender, EventArgs e)
+    {
+      if (sender is ASPxGridListEditor)
+      {
+        foreach (DevExpress.ExpressApp.Editors.ColumnWrapper columnWrapper in ((ASPxGridListEditor)sender).Columns)
         {
-          string columnName = dataColumn.Name;  // this seems to be empty in Web
-          if (string.IsNullOrEmpty(columnName))
+          ASPxGridViewColumnWrapper gridColumnWrapper = columnWrapper as ASPxGridViewColumnWrapper;
+          if (gridColumnWrapper != null)
           {
-            columnName = dataColumn.FieldName; // FieldName does not work for reference properties as it returns e.g. "AccountType.Name"
-            int dotIndex = columnName?.IndexOf('.') ?? -1;
-            if (dotIndex > -1)
-              columnName = columnName?.Substring(0, dotIndex);  // a bodge to drop ".Name" portion.
-          }
-          IModelColumn modelColumn = listEditor.Model.Columns[columnName];
-          IModelMemberAutoFilterRow modelMember = modelColumn?.ModelMember as IModelMemberAutoFilterRow;
-          if (modelMember != null && modelMember.AutoFilterRowCondition.HasValue)
-          {
-            dataColumn.Settings.AutoFilterCondition = TransformToAutoFilterCondition(modelMember.AutoFilterRowCondition.Value);
+            IModelColumn modelColumn = (this.View as ListView)?.Model.Columns[gridColumnWrapper.PropertyName];
+            IModelMemberAutoFilterRow modelMember = modelColumn?.ModelMember as IModelMemberAutoFilterRow;
+            if (modelMember != null && modelMember.AutoFilterRowCondition.HasValue)
+              gridColumnWrapper.Column.Settings.AutoFilterCondition = TransformToAutoFilterCondition(modelMember.AutoFilterRowCondition.Value);
           }
         }
       }
     }
 
     #endregion
+
+    //#region OnViewControlsCreated
+
+    ////Alternative implementation
+    //protected override void OnViewControlsCreated()
+    //{
+    //  base.OnViewControlsCreated();
+
+    //  ASPxGridListEditor listEditor = ((ListView)View).Editor as ASPxGridListEditor;
+    //  if (listEditor != null)
+    //  {
+    //    foreach (ASPxGridViewColumnWrapper columnWrapper in listEditor.Columns)
+    //    {
+    //      IModelColumn modelColumn = (this.View as ListView)?.Model.Columns[columnWrapper.PropertyName];
+    //      IModelMemberAutoFilterRow modelMember = modelColumn?.ModelMember as IModelMemberAutoFilterRow;
+    //      if (modelMember != null && modelMember.AutoFilterRowCondition.HasValue)
+    //        columnWrapper.Column.Settings.AutoFilterCondition = TransformToAutoFilterCondition(modelMember.AutoFilterRowCondition.Value);
+    //    }
+    //  }
+    //}
+
+    //#endregion
 
     #region TransformToAutoFilterCondition
 
@@ -88,8 +151,44 @@ namespace AutoFilterRowEx.Web.Controllers
 
         default: throw new UserFriendlyException($"Auto Filter Row Condition {filterType} was not recognised.");
       }
-      
-      #endregion
     }
+
+    #endregion
+
+    #region TransformFromAutoFilterCondition
+
+    private AutoFilterRowCondition TransformFromAutoFilterCondition(DevExpress.Web.AutoFilterCondition filterType)
+    {
+      switch (filterType)
+      {
+        case DevExpress.Web.AutoFilterCondition.Default: return AutoFilterRowCondition.Default;
+
+        case DevExpress.Web.AutoFilterCondition.Like: return AutoFilterRowCondition.Like;
+
+        case DevExpress.Web.AutoFilterCondition.Equals: return AutoFilterRowCondition.Equals;
+
+        case DevExpress.Web.AutoFilterCondition.Contains: return AutoFilterRowCondition.Contains;
+
+        case DevExpress.Web.AutoFilterCondition.BeginsWith: return AutoFilterRowCondition.BeginsWith;
+
+        case DevExpress.Web.AutoFilterCondition.EndsWith: return AutoFilterRowCondition.EndsWith;
+
+        case DevExpress.Web.AutoFilterCondition.DoesNotContain: return AutoFilterRowCondition.DoesNotContain;
+
+        case DevExpress.Web.AutoFilterCondition.NotEqual: return AutoFilterRowCondition.DoesNotEqual;
+
+        case DevExpress.Web.AutoFilterCondition.Greater: return AutoFilterRowCondition.Greater;
+
+        case DevExpress.Web.AutoFilterCondition.GreaterOrEqual: return AutoFilterRowCondition.GreaterOrEqual;
+
+        case DevExpress.Web.AutoFilterCondition.Less: return AutoFilterRowCondition.Less;
+
+        case DevExpress.Web.AutoFilterCondition.LessOrEqual: return AutoFilterRowCondition.LessOrEqual;
+
+        default: throw new UserFriendlyException($"Auto Filter Condition {filterType} was not recognised.");
+      }
+    }
+
+    #endregion
   }
 }
