@@ -25,10 +25,12 @@ namespace AutoFilterRowEx.Win.Controllers
     protected override void OnActivated()
     {
       base.OnActivated();
-      if (this.View is ListView)
+
+      ListView listView = this.View as ListView;
+      if (listView != null)
       {
-        (this.View as ListView).Editor.ModelApplied += Editor_ModelApplied;
-        (this.View as ListView).Editor.ModelSaved += Editor_ModelSaved;
+        listView.Editor.ModelApplied += Editor_ModelApplied;
+        listView.Editor.ModelSaved += Editor_ModelSaved;
       }
     }
 
@@ -38,11 +40,13 @@ namespace AutoFilterRowEx.Win.Controllers
 
     protected override void OnDeactivated()
     {
-      if (this.View is ListView)
+      ListView listView = this.View as ListView;
+      if (listView != null)
       {
-        (this.View as ListView).Editor.ModelApplied -= Editor_ModelApplied;
-        (this.View as ListView).Editor.ModelSaved -= Editor_ModelSaved;
+        listView.Editor.ModelApplied -= Editor_ModelApplied;
+        listView.Editor.ModelSaved -= Editor_ModelSaved;
       }
+
       base.OnDeactivated();
     }
 
